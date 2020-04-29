@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.meergruen.time_sheets.MainActivity">
+    <item
+        android:id="@+id/action_timesheets"
+        android:orderInCategory="100"
+        android:title="@string/action_time_sheets"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_overview"
+        android:orderInCategory="100"
+        android:title="@string/action_overview"
+        app:showAsAction="never" />
+</menu>

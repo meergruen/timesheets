@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Time Sheets</string>
+    <string name="action_time_sheets">Settings</string>
+    <string name="category_hint">Category</string>
+    <string name="subcategory_hint">Subcategory</string>
+    <string name="comment_hint">Comment…</string>
+    <string name="action_overview">Overview</string>
+    <string name="recent_label">Recent:</string>
+    <string name="items_hint">items…</string>
+    <string name="most_used_label">Most used:</string>
+    <string name="start_label">Start</string>
+    <string name="stop_label">Stop</string>
+    <string name="category_label">Categories:</string>
+    <string name="task_label">Task</string>
+    <string name="subcategory_label">Subcategories:</string>
+    <string name="dash">-</string>
+</resources>
