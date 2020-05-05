@@ -29,7 +29,7 @@ class OverviewActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_timesheets -> true
+            R.id.action_time_sheets -> true
             else -> super.onOptionsItemSelected(item)
         }
     }

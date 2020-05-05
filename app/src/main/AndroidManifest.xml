@@ -3,11 +3,11 @@
     package="com.meergruen.time_sheets">
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:allowBackup="true"
         android:theme="@style/AppTheme">
         <activity
             android:name="com.meergruen.time_sheets.MainActivity"
@@ -22,12 +22,12 @@
         <activity
             android:name="com.meergruen.time_sheets.OverviewActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name="com.meergruen.time_sheets.TimeSheetsActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

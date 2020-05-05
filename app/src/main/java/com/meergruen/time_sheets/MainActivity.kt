@@ -1,6 +1,7 @@
 package com.meergruen.time_sheets
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
 
     private var currentCategory: String = ""
     private var currentSubcategory: String = ""
+    private var currentTask: TimeSheetTask? = null // init when started
 
     private var timerRunning = false
     private var startTime: Date = Date()
@@ -121,7 +123,10 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_timesheets -> true
+            R.id.action_time_sheets -> {
+                startActivity(Intent(this, TimeSheetsActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -129,7 +134,7 @@ class MainActivity : AppCompatActivity() {
 
     // Button
 
-    fun onStartStopButtonPressed(view: View) {
+    fun onStartStopButtonPressed(v: View) {
 
         if ( timerRunning ) {
 
@@ -179,7 +184,6 @@ class MainActivity : AppCompatActivity() {
         val file = File(getDir("data", Context.MODE_PRIVATE), "categories")
 
 
-
         /*
 
         if (file.exists()) {
@@ -207,7 +211,7 @@ class MainActivity : AppCompatActivity() {
     private fun saveCategoryList() {
 
 
-        subcategories[currentCategory] = currentSubcategories!!
+        subcategories[currentCategory] = currentSubcategories
         if (subcategories[currentCategory]!!.getPosition(currentSubcategory) < 0) {
 
             // Update array adapter
@@ -273,7 +277,7 @@ class MainActivity : AppCompatActivity() {
         val subcategory = subcategoryInput.text.toString()
         val comment = commentInput.text.toString()
 
-        timeSheetItems.add(TimeSheetItem(category, subcategory, comment, startTime, endTime))
+        timeSheetItems.add(TimeSheetItem(currentTask!!, comment, startTime, endTime)) // init currenttask
 
         val file = File(getDir("data", Context.MODE_PRIVATE), "time_sheet_items")
         val outputStream = ObjectOutputStream(FileOutputStream(file))

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.meergruen.time_sheets.MainActivity">
     <item
-        android:id="@+id/action_timesheets"
+        android:id="@+id/action_time_sheets"
         android:orderInCategory="100"
         android:title="@string/action_time_sheets"
         app:showAsAction="never" />
