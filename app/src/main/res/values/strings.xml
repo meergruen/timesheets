@@ -15,4 +15,10 @@
     <string name="subcategory_label">Projects:</string>
     <string name="dash">-</string>
     <string name="action_main">Timer</string>
+    <string name="category_header">Category</string>
+    <string name="subcategory_header">Project</string>
+    <string name="comment_header">Description</string>
+    <string name="date_header">Date</string>
+    <string name="date_hint">8.5.2020 10:30</string>
+    <string name="description_hint">Implementierung von ganz vielen lustigen Sachen</string>
 </resources>

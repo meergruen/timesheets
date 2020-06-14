@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/start_date_column"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/date_hint"
+        android:layout_margin="5dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/category_column"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/category_hint"
+        android:layout_margin="5dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/subcategory_column"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/subcategory_hint"
+        android:layout_margin="5dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/comment_column"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/description_hint"
+        android:layout_margin="5dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/end_date_column"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/date_hint"
+        android:layout_margin="5dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/duration_column"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/date_hint"
+        android:layout_margin="5dp"
+        android:textSize="16sp" />
+</TableRow>

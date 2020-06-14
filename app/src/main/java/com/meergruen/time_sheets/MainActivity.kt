@@ -2,17 +2,19 @@ package com.meergruen.time_sheets
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var commentInput: EditText
 
     private lateinit var categoryList: ListView
-    private lateinit var subcategoryList: ListView
+    private lateinit var filteredList: ListView
     private lateinit var recentList: ListView
     private lateinit var popularList: ListView
 
@@ -31,20 +33,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startStopButton: Button
 
     private lateinit var categories: ArrayAdapter<String>
-    private lateinit var currentSubcategories: ArrayAdapter<String>
-    private lateinit var recentTasks: TaskArrayAdapter
-    private lateinit var popularTasks: TaskArrayAdapter
 
-    private var subcategories: HashMap<String, ArrayAdapter<String>> = HashMap()
+    private lateinit var filteredTasks: TimeSheetTaskArrayAdapter
+    private lateinit var recentTasks: TimeSheetTaskArrayAdapter
+    private lateinit var popularTasks: TimeSheetTaskArrayAdapter
 
-    private var categoriesUsed: ArrayList<TimeSheetTask> = ArrayList()
-    private var recentUsed: ArrayList<TimeSheetTask> = ArrayList()
-    private var mostUsed: ArrayList<TimeSheetTask> = ArrayList()
+    private var timeSheetTasks: ArrayList<TimeSheetTask> = ArrayList()
     private var timeSheetItems: ArrayList<TimeSheetItem> = ArrayList()
 
+    private var currentComment: String = ""
     private var currentCategory: String = ""
     private var currentSubcategory: String = ""
-    private var currentTask: TimeSheetTask? = null // init when started
+    private var currentTask: TimeSheetTask = TimeSheetTask("", "")
 
     private var timerRunning = false
     private var startTime: Date = Date()
@@ -57,25 +57,17 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-
         categoryInput = findViewById(R.id.category_input)
         subcategoryInput = findViewById(R.id.subcategory_input)
         commentInput = findViewById(R.id.comment_input)
 
-
         categoryList = findViewById(R.id.category_list)
-        subcategoryList = findViewById(R.id.subcategory_list)
+        filteredList = findViewById(R.id.subcategory_list)
         popularList = findViewById(R.id.popular_list)
         recentList = findViewById(R.id.recent_list)
 
-        timer = findViewById(R.id.timer);
+        timer = findViewById(R.id.timer)
         startStopButton = findViewById(R.id.start_stop_button)
-
-
-        categories = ArrayAdapter<String>(this, R.layout.string_row)
-        currentSubcategories = ArrayAdapter<String>(this, R.layout.string_row)
-        recentTasks = TaskArrayAdapter(this, categoriesUsed)
-        popularTasks = TaskArrayAdapter(this, categoriesUsed)
 
         
         // Enable changing Task by selecting Item in a list
@@ -83,12 +75,15 @@ class MainActivity : AppCompatActivity() {
         categoryList.setOnItemClickListener { _, _, position, _ ->
             currentCategory = categories.getItem(position) ?: ""
             categoryInput.setText(currentCategory, TextView.BufferType.EDITABLE)
-            updateSubcategoryListView()
+            updateFiltered()
         }
 
-        subcategoryList.setOnItemClickListener { _, _, position, _ ->
-            currentSubcategory = currentSubcategories.getItem(position) ?: ""
+        filteredList.setOnItemClickListener {  _, _, position, _ ->
+            currentCategory = filteredTasks.getItem(position)?.category ?: ""
+            currentSubcategory = filteredTasks.getItem(position)?.subcategory ?: ""
+            categoryInput.setText(currentCategory, TextView.BufferType.EDITABLE)
             subcategoryInput.setText(currentSubcategory, TextView.BufferType.EDITABLE)
+            updateFiltered()
         }
 
         recentList.setOnItemClickListener { _, _, position, _ ->
@@ -96,19 +91,18 @@ class MainActivity : AppCompatActivity() {
             currentSubcategory = recentTasks.getItem(position)?.subcategory ?: ""
             categoryInput.setText(currentCategory, TextView.BufferType.EDITABLE)
             subcategoryInput.setText(currentSubcategory, TextView.BufferType.EDITABLE)
-            updateSubcategoryListView()
+            updateFiltered()
         }
 
         popularList.setOnItemClickListener { _, _, position, _ ->
-            currentCategory = recentTasks.getItem(position)?.category ?: ""
-            currentSubcategory = recentTasks.getItem(position)?.subcategory ?: ""
+            currentCategory = popularTasks.getItem(position)?.category ?: ""
+            currentSubcategory = popularTasks.getItem(position)?.subcategory ?: ""
             categoryInput.setText(currentCategory, TextView.BufferType.EDITABLE)
             subcategoryInput.setText(currentSubcategory, TextView.BufferType.EDITABLE)
-            updateSubcategoryListView()
+            updateFiltered()
         }
 
-
-        initCategoryLists()
+        initRecommendations()
 
     }
 
@@ -127,6 +121,10 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, TimeSheetsActivity::class.java))
                 true
             }
+            R.id.action_overview -> {
+                startActivity(Intent(this, OverviewActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -134,33 +132,44 @@ class MainActivity : AppCompatActivity() {
 
     // Button
 
-    fun onStartStopButtonPressed(v: View) {
+    fun onStartStopButtonPressed(@Suppress("UNUSED_PARAMETER")v: View) {
 
         if ( timerRunning ) {
 
-            timer.stop();
-            endTime = Date()
-
+            // Adjust Screen
             startStopButton.text = getString(R.string.start_label)
             startStopButton.setBackgroundColor(ContextCompat.getColor(this, R.color.startGreen))
-
-          //  saveData()
-          //  saveCategoryList()
 
             enableEditText(categoryInput)
             enableEditText(subcategoryInput)
             enableEditText(commentInput)
-/*
-            enableEditText(categoryList)
-            enableEditText(subcategoryList)*/
+
+            // Add Task to List
+            currentTask = TimeSheetTask(currentCategory, currentSubcategory)
+            val newItemAdded = updateTimeSheetTasks()
+            saveTimeSheetTasks(this, timeSheetTasks)
+
+            // Update Visible Recommendations
+            recentTasks = updateRecommendationView(recentList, timeSheetTasks, compareByDescending { it.lastUsed })
+            popularTasks = updateRecommendationView(popularList, timeSheetTasks, compareByDescending { it.timesUsed })
+            if (newItemAdded) {
+                updateCategoryView()
+                updateFiltered()
+            }
+
+            // Add Item to List
+            timeSheetItems.add(TimeSheetItem(currentTask, currentComment, startTime, endTime))
+            saveTimeSheetItems(this, timeSheetItems)
+
+            // (Re-)Start Timer
+            timer.stop()
+            endTime = Date()
             timerRunning = false
 
         }
         else {
 
-            timer.start();
-            startTime = Date()
-
+            // Adjust Screen
             startStopButton.text = getString(R.string.stop_label)
             startStopButton.setBackgroundColor(ContextCompat.getColor(this, R.color.stopRed))
 
@@ -168,122 +177,91 @@ class MainActivity : AppCompatActivity() {
             disableEditText(subcategoryInput)
             disableEditText(commentInput)
 
-/*
-            disableEditText(categoryList)
-            disableEditText(subcategoryList)*/
+
+            // Initialize Item Info
+            currentCategory = categoryInput.text.toString()
+            currentSubcategory = subcategoryInput.text.toString()
+            currentComment = commentInput.text.toString()
+
+            // (Re-)Start Timer
             timerRunning = true
+            timer.base = SystemClock.elapsedRealtime()
+            timer.start()
+            startTime = Date()
 
         }
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean { // Clear cursor when tap outside occurs
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (v is EditText) {
+                val outRect = Rect()
+                v.getGlobalVisibleRect(outRect)
+                if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+                    v.clearFocus()
+                    val imm: InputMethodManager =
+                        getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0)
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event)
     }
 
 
     // Helper functions
 
-    @Suppress("unchecked_cast")
-    private fun initCategoryLists() {
-        val file = File(getDir("data", Context.MODE_PRIVATE), "categories")
-
-
-        /*
-
-        if (file.exists()) {
-            val inputStream = ObjectInputStream(FileInputStream(file))
-            categoriesUsed = inputStream.readObject() as ArrayList<TimeSheetSubject>
-
-            for (item in categoriesUsed ) {
-                if (item.category in subcategories) {
-
-                    subcategories[item.category]!!.add(item.subcategory)
-                }
-                else {
-
-                    categories!!.add(item.category)
-                    subcategories[item.category] = ArrayAdapter<String>(this, R.layout.string_row)
-                }
+    private fun updateTimeSheetTasks(): Boolean {
+        for ( task: TimeSheetTask in timeSheetTasks) {
+            if ( task.category == currentCategory && task.subcategory == currentSubcategory) {
+                task.hasBeenUsedAgain()
+                return false
             }
-            categories!!.addAll(subcategories.keys)
-        }*/
+        }
+        timeSheetTasks.add( currentTask )
+        return true
+    }
 
+    private fun updateRecommendationView(listView: ListView,  tasks: List<TimeSheetTask>,
+                                         comparator: Comparator<TimeSheetTask>): TimeSheetTaskArrayAdapter {
+        listView.adapter = TimeSheetTaskArrayAdapter(this, tasks.sortedWith(comparator))
+        return listView.adapter as TimeSheetTaskArrayAdapter
+    }
+
+    private fun updateCategoryView() {
+        categories = ArrayAdapter<String>(this, R.layout.string_row)
+        categories.addAll(timeSheetTasks.map {it.category}.distinct().sorted())
         categoryList.adapter = categories
-        subcategoryList.adapter = currentSubcategories
     }
 
-    private fun saveCategoryList() {
-
-
-        subcategories[currentCategory] = currentSubcategories
-        if (subcategories[currentCategory]!!.getPosition(currentSubcategory) < 0) {
-
-            // Update array adapter
-            subcategories[currentCategory]!!.add(currentSubcategory)
-
-            // Update List to write
-            categoriesUsed.add(TimeSheetTask(currentCategory, currentSubcategory))
-
-        }
-        else {
-            // Update list to write
-            val subject = findTimeSheetSubject(currentCategory, currentSubcategory)
-            subject!!.hasBeenUsedAgain()
-        }
-
-        val file = File(getDir("data", Context.MODE_PRIVATE), "categories")
-        val outputStream = ObjectOutputStream(FileOutputStream(file))
-        outputStream.writeObject(categoriesUsed)
-        outputStream.flush()
-        outputStream.close()
+    private fun updateFiltered() {
+        val filtered = ArrayList(timeSheetTasks.filter {it.category == currentCategory})
+        filteredTasks = updateRecommendationView(filteredList, filtered, compareBy ({ it.category }, {it.subcategory}))
     }
 
+    private fun initRecommendations() {
 
-    private fun findTimeSheetSubject(category: String, subcategory: String): TimeSheetTask? {
-        for ( item: TimeSheetTask in categoriesUsed) {
-            if ( item.category == category && item.subcategory == subcategory) {
-                return item
-            }
-        }
-        return null
+        timeSheetTasks = loadTimeSheetTasks(this)
+
+        updateCategoryView()
+        updateFiltered()
+
+        recentTasks = updateRecommendationView(recentList, timeSheetTasks, compareByDescending { it.lastUsed })
+        popularTasks = updateRecommendationView(popularList, timeSheetTasks, compareByDescending { it.timesUsed })
     }
 
-
-
-    private fun updateSubcategoryListView() {
-        if (currentCategory in subcategories) {
-            currentSubcategories = subcategories[currentCategory]!!
-        }
-        else {
-            subcategories[currentCategory] = ArrayAdapter<String>(this, R.layout.string_row)
-            currentSubcategories = subcategories[currentCategory]!!
-        }
-    }
 
     private fun disableEditText(editText: EditText) {
-        editText.isFocusable = false
         editText.isEnabled = false
-        editText.isCursorVisible = false
-        //editText.keyListener = null
         editText.setBackgroundResource(R.drawable.rounded_corner_disabled)
     }
 
 
     private fun enableEditText(editText: EditText) {
-        editText.isFocusable = true
         editText.isEnabled = true
-        editText.isCursorVisible = true
         editText.setBackgroundResource(R.drawable.rounded_corner_enabled)
     }
 
-    private fun saveData() {
-        val category = categoryInput.text.toString()
-        val subcategory = subcategoryInput.text.toString()
-        val comment = commentInput.text.toString()
-
-        timeSheetItems.add(TimeSheetItem(currentTask!!, comment, startTime, endTime)) // init currenttask
-
-        val file = File(getDir("data", Context.MODE_PRIVATE), "time_sheet_items")
-        val outputStream = ObjectOutputStream(FileOutputStream(file))
-        outputStream.writeObject(timeSheetItems)
-        outputStream.flush()
-        outputStream.close()
-    }
 
 }

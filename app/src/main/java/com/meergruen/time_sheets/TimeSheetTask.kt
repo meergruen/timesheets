@@ -6,7 +6,7 @@ import kotlin.Comparator
 
 class TimeSheetTask (val category: String, val subcategory: String ): Serializable, Comparator<TimeSheetTask> {
 
-    var lastUsed: Date? = Date()
+    var lastUsed: Date = Date()
     var timesUsed: Int = 1
 
     fun hasBeenUsedAgain() {
@@ -21,7 +21,7 @@ class TimeSheetTask (val category: String, val subcategory: String ): Serializab
                 ", timesUsed=" + timesUsed + "]"
     }
 
-    override fun compare(task1: TimeSheetTask, task2: TimeSheetTask): Int {
+    override fun compare(task1: TimeSheetTask, task2: TimeSheetTask): Int { // natural, alphabetical ordering
         if ( task1.category < task2.category ) return -1
         if ( task1.category > task2.category ) return 1
         if ( task1.subcategory < task2.subcategory ) return -1

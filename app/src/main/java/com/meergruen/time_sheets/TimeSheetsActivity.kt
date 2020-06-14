@@ -35,6 +35,8 @@ class TimeSheetsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_time_sheets)
+       // val actionBar = actionBar // works?
+       // actionBar!!.setDisplayHomeAsUpEnabled(true)
 
         // Retrieve the Toolbar from our content view, and set it as the action bar
        /* val toolbar: Toolbar = findViewById(R.id.toolbar)

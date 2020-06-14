@@ -7,15 +7,15 @@ import android.view.MenuItem
 
 class OverviewActivity : AppCompatActivity() {
 
+    private lateinit var itemAdapter: TimeSheetItemArrayAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_overview)
         //setSupportActionBar(findViewById(R.id.toolbar_overview))
- /*
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }*/
+
+        itemAdapter = TimeSheetItemArrayAdapter(this, ArrayList<TimeSheetItem>()) // TODO: use real items
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

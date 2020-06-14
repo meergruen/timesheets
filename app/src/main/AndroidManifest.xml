@@ -12,6 +12,7 @@
         <activity
             android:name="com.meergruen.time_sheets.MainActivity"
             android:label="@string/app_name"
+            android:windowSoftInputMode="adjustNothing|stateHidden"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,12 +22,14 @@
         </activity>
         <activity
             android:name="com.meergruen.time_sheets.OverviewActivity"
-            android:label="@string/app_name"
+            android:label="Overview"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name="com.meergruen.time_sheets.TimeSheetsActivity"
-            android:label="@string/app_name"
+            android:label="Time Sheets"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
         </activity>
     </application>

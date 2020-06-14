@@ -15,11 +15,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:orientation="vertical"
-        android:weightSum="2"
+        android:paddingTop="60dp"
+        android:weightSum="3"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/category_recommendations">
+        app:layout_constraintBottom_toTopOf="@+id/category_listings">
 
         <TextView
             android:id="@+id/task_label"
@@ -85,23 +86,23 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/category_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/category_label"
-                android:textSize="16sp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp" />
+                android:textSize="16sp" />
             <ListView
                 android:id="@+id/category_list"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:divider="@null"
                 android:smoothScrollbar="true"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:background="@drawable/rounded_corner_enabled" />
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -109,23 +110,24 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/subcategory_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/subcategory_label"
-                android:textSize="16sp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp" />
+                android:textSize="16sp" />
 
             <ListView
                 android:id="@+id/subcategory_list"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:background="@drawable/rounded_corner_enabled"/>
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:divider="@null"
+                android:smoothScrollbar="true"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"/>
         </LinearLayout>
 
     </LinearLayout>
@@ -147,24 +149,25 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/recent_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/recent_label"
-                android:textSize="16sp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp" />
+                android:textSize="16sp" />
 
             <ListView
                 android:id="@+id/recent_list"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
                 android:hint="@string/items_hint"
+                android:divider="@null"
                 android:smoothScrollbar="true"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"/>
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -172,24 +175,25 @@
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/popular_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/most_used_label"
-                android:textSize="16sp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp" />
+                android:textSize="16sp"/>
 
             <ListView
                 android:id="@+id/popular_list"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
                 android:hint="@string/items_hint"
+                android:divider="@null"
                 android:smoothScrollbar="true"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"/>
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"/>
         </LinearLayout>
 
     </LinearLayout>
@@ -210,7 +214,7 @@
         android:id="@+id/start_stop_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="20dp"
         android:text="@string/start_label"
         android:onClick="onStartStopButtonPressed"
         android:background="@color/startGreen"
