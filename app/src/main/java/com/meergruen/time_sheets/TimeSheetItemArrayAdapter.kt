@@ -29,18 +29,16 @@ class TimeSheetItemArrayAdapter(context: Context, items: ArrayList<TimeSheetItem
         val item: TimeSheetItem? = getItem(position)
 
         // Lookup view for data population
-        val category = resView.findViewById(R.id.category_column) as TextView
-        val subcategory = resView.findViewById(R.id.subcategory_column) as TextView
-        val startDate = resView.findViewById(R.id.start_date_column) as TextView
-        val endDate = resView.findViewById(R.id.end_date_column) as TextView
-        val duration = resView.findViewById(R.id.duration_column) as TextView
-        val comment = resView.findViewById(R.id.comment_column) as TextView
+        val category = resView.findViewById(R.id.category_input) as TextView
+        val subcategory = resView.findViewById(R.id.subcategory_input) as TextView
+        val startDate = resView.findViewById(R.id.start_date_input) as TextView
+        val duration = resView.findViewById(R.id.duration_input) as TextView
+        val comment = resView.findViewById(R.id.comment_input) as TextView
 
         // Populate the data into the template view using the data object
         category.text = item!!.timeSheetTask.category
         subcategory.text = item.timeSheetTask.subcategory
         startDate.text = dateFormat.format(item.startTime)
-        endDate.text = dateFormat.format(item.endTime)
         duration.text = "%.2f".format(item.duration(durationUnit))
         comment.text = item.comment
 

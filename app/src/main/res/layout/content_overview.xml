@@ -8,18 +8,38 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".OverviewActivity"
     tools:showIn="@layout/activity_overview">
-    <TableLayout
+    <ScrollView
+        android:id="@+id/raw_data_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/save_button"
+        android:layout_margin="20dp"
+        android:scrollbars="none"
+        android:layout_weight="1">
+    <TableLayout
+        android:id="@+id/raw_data_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
         <TableRow
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/date_header"
+                android:id="@+id/start_date_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/date_header"
+                android:text="@string/start_date_header"
+                android:layout_margin="5dp"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/end_date_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/spent_header"
                 android:layout_margin="5dp"
                 android:textSize="20sp" />
             <TextView
@@ -48,31 +68,91 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
+            <EditText
+                android:id="@+id/start_date_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="8.5.2020"
+                android:text="@string/date_hint"
+                android:hint="@string/date_hint"
+                android:autofillHints="DateTime"
+                android:inputType="datetime"
+                android:background="@color/text_background_enabled"
                 android:layout_margin="5dp"
                 android:textSize="16sp" />
-            <TextView
+
+            <EditText
+                android:id="@+id/duration_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2 h"
+                android:hint="@string/duration"
+                android:autofillHints="Duration"
+                android:inputType="text"
+                android:background="@color/text_background_enabled"
+                android:layout_margin="5dp"
+                android:textSize="16sp" />
+            <EditText
+                android:id="@+id/category_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Arbeit"
+                android:inputType="text"
+                android:hint="@string/category_hint"
+                android:autofillHints="@string/category_hint"
+                android:background="@color/text_background_enabled"
                 android:layout_margin="5dp"
                 android:textSize="16sp" />
-            <TextView
+            <EditText
+                android:id="@+id/subcategory_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="datahike"
+                android:hint="@string/subcategory_hint"
+                android:autofillHints="@string/subcategory_hint"
+                android:inputType="text"
+                android:background="@color/text_background_enabled"
                 android:layout_margin="5dp"
                 android:textSize="16sp" />
-            <TextView
+            <EditText
+                android:id="@+id/comment_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:scrollbars="horizontal"
+                android:inputType="text"
                 android:text="Implementierung von ganz vielen lustigen Sachen"
+                android:hint="@string/comment_hint"
+                android:autofillHints="@string/comment_hint"
+                android:background="@color/text_background_enabled"
                 android:layout_margin="5dp"
                 android:textSize="16sp" />
+
         </TableRow>
     </TableLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="@string/save_changes"
+        android:onClick="onSaveButtonPressed"
+        android:background="@color/startGreen"
+        app:layout_constraintTop_toBottomOf="@+id/raw_data_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/reload_button"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+    <Button
+        android:id="@+id/reload_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="@string/reset_data"
+        android:onClick="onResetButtonPressed"
+        android:background="@color/stopRed"
+        app:layout_constraintTop_toBottomOf="@+id/raw_data_view"
+        app:layout_constraintLeft_toRightOf="@+id/save_button"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

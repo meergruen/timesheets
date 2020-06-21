@@ -2,6 +2,7 @@ package com.meergruen.time_sheets
 
 import java.io.Serializable
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -28,9 +29,9 @@ class TimeSheetSpecification (var name: String): Serializable {
 
     // Column formatting
     var startTimeFormatPattern = "dd.MM."
-    var startTimeLocale = Locale.getDefault()
+    var startTimeLocale: Locale = Locale.getDefault()
     var endTimeFormatPattern = "dd.MM."
-    var endTimeLocale = Locale.getDefault()
+    var endTimeLocale: Locale = Locale.getDefault()
     var durationUnit = Duration.HOURS
 
     // Private variables
@@ -39,7 +40,7 @@ class TimeSheetSpecification (var name: String): Serializable {
 
     // Formatting
 
-    fun getDateString(date: Date, dateFormatPattern: String, locale: Locale): String {
+    fun getDateString(date: LocalDateTime, dateFormatPattern: String, locale: Locale): String {
         val dateFormat =  SimpleDateFormat(dateFormatPattern, locale)
         return dateFormat.format(date)
     }
@@ -86,20 +87,20 @@ class TimeSheetSpecification (var name: String): Serializable {
     }
 
 
-    fun getItemsSince(items: ArrayList<TimeSheetItem>, since: Date) : ArrayList<TimeSheetItem> {
+    fun getItemsSince(items: ArrayList<TimeSheetItem>, since: LocalDateTime) : ArrayList<TimeSheetItem> {
         val list = ArrayList<TimeSheetItem>()
         for ( item in items) {
-            if ( item.startTime > since ) {
+            if ( item.startTime >= since ) {
                 list.add(item)
             }
         }
         return list
     }
 
-    fun getItemsUntil(items: ArrayList<TimeSheetItem>, until: Date) : ArrayList<TimeSheetItem> {
+    fun getItemsUntil(items: ArrayList<TimeSheetItem>, until: LocalDateTime) : ArrayList<TimeSheetItem> {
         val list = ArrayList<TimeSheetItem>()
         for ( item in items) {
-            if ( item.startTime < until ) {
+            if ( item.startTime <= until ) {
                 list.add(item)
             }
         }
@@ -107,19 +108,16 @@ class TimeSheetSpecification (var name: String): Serializable {
     }
 
 
-    fun getItemsSinceUntil(items: ArrayList<TimeSheetItem>, since: Date, until: Date) : ArrayList<TimeSheetItem> {
+    fun getItemsSinceUntil(items: ArrayList<TimeSheetItem>, since: LocalDateTime, until: LocalDateTime) : ArrayList<TimeSheetItem> {
         return getItemsUntil(getItemsSince(items, since), until)
     }
 
 
     fun getItemsCurrentMonth(items: ArrayList<TimeSheetItem>) : ArrayList<TimeSheetItem> {
         val list = ArrayList<TimeSheetItem>()
-        calendar.time = Date()
-        val thisMonth = calendar.get(Calendar.MONTH)
+        val thisMonth = LocalDateTime.now().month
         for ( item in items) {
-            calendar.time = item.startTime
-            val monthOfTask = calendar.get(Calendar.MONTH)
-            if ( monthOfTask == thisMonth ) {
+            if ( item.startTime.month == thisMonth ) {
                 list.add(item)
             }
         }
@@ -128,13 +126,9 @@ class TimeSheetSpecification (var name: String): Serializable {
 
     fun getItemsLastMonth(items: ArrayList<TimeSheetItem>) : ArrayList<TimeSheetItem> {
         val list = ArrayList<TimeSheetItem>()
-        calendar.time = Date()
-        calendar.add(Calendar.MONTH, -1)
-        val lastMonth = calendar.get(Calendar.MONTH)
+        val lastMonth = LocalDateTime.now().minusMonths(1).month
         for ( item in items) {
-            calendar.time = item.startTime
-            val monthOfTask = calendar.get(Calendar.MONTH)
-            if ( monthOfTask == lastMonth ) {
+            if ( item.startTime.month == lastMonth ) {
                 list.add(item)
             }
         }

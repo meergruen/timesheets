@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -47,8 +48,8 @@ class MainActivity : AppCompatActivity() {
     private var currentTask: TimeSheetTask = TimeSheetTask("", "")
 
     private var timerRunning = false
-    private var startTime: Date = Date()
-    private var endTime: Date = Date()
+    private var startTime: LocalDateTime = LocalDateTime.now()
+    private var endTime: LocalDateTime = LocalDateTime.now()
 
 
 
@@ -163,7 +164,7 @@ class MainActivity : AppCompatActivity() {
 
             // (Re-)Start Timer
             timer.stop()
-            endTime = Date()
+            endTime = LocalDateTime.now()
             timerRunning = false
 
         }
@@ -187,7 +188,7 @@ class MainActivity : AppCompatActivity() {
             timerRunning = true
             timer.base = SystemClock.elapsedRealtime()
             timer.start()
-            startTime = Date()
+            startTime = LocalDateTime.now()
 
         }
     }

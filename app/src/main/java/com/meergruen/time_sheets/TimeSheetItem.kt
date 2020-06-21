@@ -1,18 +1,23 @@
 package com.meergruen.time_sheets
 
+import android.util.Log
 import java.io.Serializable
+import java.time.LocalDateTime
+import java.time.Period
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.math.abs
 
 class TimeSheetItem (
     var timeSheetTask: TimeSheetTask,
     var comment: String,
-    var startTime: Date,
-    var endTime: Date
+    var startTime: LocalDateTime,
+    var endTime: LocalDateTime
 ): Serializable {
 
-    fun durationInMilliSeconds(): Long {
-        return abs(endTime.time - startTime.time)
+    fun durationInMilliSeconds(): Double {
+        val duration = java.time.Duration.between(startTime, endTime)
+        return duration.toMillis().toDouble()
     }
 
     fun durationInSeconds(): Double {
@@ -37,11 +42,12 @@ class TimeSheetItem (
 
 
     fun duration(unit: Duration): Double {
+
         return when (unit) {
             Duration.MINUTES -> durationInMinutes()
             Duration.HOURS -> durationInHours()
             Duration.DAYS -> durationInDays()
-            Duration.WORKDAYS -> durationInWorkdays()
+            Duration.WORKDAYS -> durationInDays()
         }
     }
 
