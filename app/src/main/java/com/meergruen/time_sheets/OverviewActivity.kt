@@ -2,7 +2,6 @@ package com.meergruen.time_sheets
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -13,8 +12,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.meergruen.time_sheets.db.AppDatabase
+import com.meergruen.time_sheets.db.DataRepository
+import com.meergruen.time_sheets.db.TimeSheetItemEntity
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*
@@ -22,7 +23,7 @@ import java.util.*
 
 class OverviewActivity : AppCompatActivity() {
 
-    private lateinit var timeSheetItems: ArrayList<TimeSheetItem>
+    private lateinit var timeSheetItems: List<TimeSheetItemEntity>
 
     private var dateFormatPattern = "dd.MM.yyyy"
     private var locale = Locale.getDefault()
@@ -37,12 +38,19 @@ class OverviewActivity : AppCompatActivity() {
         createEditableItemTable()
 
     }
+    private fun getDatabase(): AppDatabase? {
+        return AppDatabase.getDatabase(this)
+    }
+
+    private fun getRepository(): DataRepository? {
+        return DataRepository.getInstance(getDatabase()!!)
+    }
 
     @SuppressLint("SetTextI18n")
     private fun createEditableItemTable() {
         val dateFormat =  SimpleDateFormat(dateFormatPattern, locale)
 
-        timeSheetItems = loadTimeSheetItems(this)
+        timeSheetItems = getRepository()?.getTimeSheetItems()!!
 
         val table = findViewById<TableLayout>(R.id.raw_data_table)
 
@@ -64,8 +72,8 @@ class OverviewActivity : AppCompatActivity() {
             val comment = row.findViewById(R.id.comment_input) as EditText
 
             // Populate the data into the template view using the data object
-            category.setText(item.timeSheetTask.category, TextView.BufferType.EDITABLE)
-            subcategory.setText(item.timeSheetTask.subcategory, TextView.BufferType.EDITABLE)
+            category.setText(item.category, TextView.BufferType.EDITABLE)
+            subcategory.setText(item.subcategory, TextView.BufferType.EDITABLE)
             startDate.setText( dateFormat.format(item.startTime), TextView.BufferType.EDITABLE)
             duration.setText("%.2f".format(item.duration(durationUnit)), TextView.BufferType.EDITABLE) // TODO: time input? or 2 edit fields?
             comment.setText(item.comment, TextView.BufferType.EDITABLE)
@@ -118,17 +126,17 @@ class OverviewActivity : AppCompatActivity() {
         }
     }
 
-    fun onSaveButtonPressed(view: View) {
-        saveTimeSheetItems(this, timeSheetItems)
+    suspend fun onSaveButtonPressed(@Suppress("UNUSED_PARAMETER") view: View) {
+        getRepository()?.saveTimeSheetItems(timeSheetItems)
         Toast.makeText(this, "Data has been saved!", Toast.LENGTH_SHORT).show()
     }
 
-    fun onResetButtonPressed(view: View) {
+    fun onResetButtonPressed(@Suppress("UNUSED_PARAMETER") view: View) {
         createEditableItemTable()
         Toast.makeText(this, "Data has been reloaded!", Toast.LENGTH_SHORT).show()
     }
 
-    private fun insertDateTime(item: TimeSheetItem) {
+    private fun insertDateTime(item: TimeSheetItemEntity) {
 
         val dialogView: View = View.inflate(this, R.layout.date_time_picker, null)
         val alertDialog = android.app.AlertDialog.Builder(this).create()

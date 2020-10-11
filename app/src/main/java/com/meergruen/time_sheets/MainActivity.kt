@@ -13,6 +13,9 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.meergruen.time_sheets.db.AppDatabase
+import com.meergruen.time_sheets.db.DataRepository
+import com.meergruen.time_sheets.db.TimeSheetItemEntity
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,8 +42,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recentTasks: TimeSheetTaskArrayAdapter
     private lateinit var popularTasks: TimeSheetTaskArrayAdapter
 
-    private var timeSheetTasks: ArrayList<TimeSheetTask> = ArrayList()
-    private var timeSheetItems: ArrayList<TimeSheetItem> = ArrayList()
+    private var timeSheetTasks: MutableList<TimeSheetTask> = mutableListOf()
+    private var timeSheetItems: MutableList<TimeSheetItemEntity> = mutableListOf()
 
     private var currentComment: String = ""
     private var currentCategory: String = ""
@@ -51,10 +54,18 @@ class MainActivity : AppCompatActivity() {
     private var startTime: LocalDateTime = LocalDateTime.now()
     private var endTime: LocalDateTime = LocalDateTime.now()
 
+    private fun getDatabase(): AppDatabase? {
+        return AppDatabase.getDatabase(this)
+    }
+
+    private fun getRepository(): DataRepository? {
+        return DataRepository.getInstance(getDatabase()!!)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         setContentView(R.layout.activity_main)
 
@@ -133,7 +144,7 @@ class MainActivity : AppCompatActivity() {
 
     // Button
 
-    fun onStartStopButtonPressed(@Suppress("UNUSED_PARAMETER")v: View) {
+    suspend fun onStartStopButtonPressed(@Suppress("UNUSED_PARAMETER")v: View) {
 
         if ( timerRunning ) {
 
@@ -148,7 +159,6 @@ class MainActivity : AppCompatActivity() {
             // Add Task to List
             currentTask = TimeSheetTask(currentCategory, currentSubcategory)
             val newItemAdded = updateTimeSheetTasks()
-            saveTimeSheetTasks(this, timeSheetTasks)
 
             // Update Visible Recommendations
             recentTasks = updateRecommendationView(recentList, timeSheetTasks, compareByDescending { it.lastUsed })
@@ -159,8 +169,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             // Add Item to List
-            timeSheetItems.add(TimeSheetItem(currentTask, currentComment, startTime, endTime))
-            saveTimeSheetItems(this, timeSheetItems)
+            timeSheetItems.add(TimeSheetItemEntity(currentTask, currentComment, startTime, endTime))
+            this.getRepository()?.saveTimeSheetItems(timeSheetItems)
 
             // (Re-)Start Timer
             timer.stop()
@@ -231,7 +241,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateCategoryView() {
-        categories = ArrayAdapter<String>(this, R.layout.string_row)
+        categories = ArrayAdapter(this, R.layout.string_row)
         categories.addAll(timeSheetTasks.map {it.category}.distinct().sorted())
         categoryList.adapter = categories
     }
@@ -243,7 +253,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initRecommendations() {
 
-        timeSheetTasks = loadTimeSheetTasks(this)
+        timeSheetTasks = getRepository()?.getTimeSheetTasks()!!.toMutableList()
 
         updateCategoryView()
         updateFiltered()

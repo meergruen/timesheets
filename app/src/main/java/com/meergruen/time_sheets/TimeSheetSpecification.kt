@@ -34,9 +34,6 @@ class TimeSheetSpecification (var name: String): Serializable {
     var endTimeLocale: Locale = Locale.getDefault()
     var durationUnit = Duration.HOURS
 
-    // Private variables
-    val calendar = Calendar.getInstance()
-
 
     // Formatting
 
